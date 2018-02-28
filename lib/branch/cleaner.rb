@@ -5,6 +5,7 @@ require 'Time'
 module Branch
   module Cleaner
   	NOBLE_BRANCHES_NAMES = ["master", "develop"]
+  	DEFAULT_WEEKS = 2
 
   	options = {}
   	OptionParser.new do |opts|
@@ -15,7 +16,7 @@ module Branch
   		end
 
   		opts.on('-w=NUMBER', '--week=NUMBER', 'number of weeks. If last commit of branch if before the date, the branch will be deleted.') do |value|
-    		options[:weeks] = Float(value) rescue 2
+    		options[:weeks] = Float(value) rescue DEFAULT_WEEKS
   		end
   	end.parse!
 
@@ -31,7 +32,7 @@ module Branch
 			branch_time = Time.parse(branch)
 			now_time = Time.new
 			weeks = (now_time - branch_time) / 3600 / 24 / 7
-			(weeks > options[:weeks]) && !(NOBLE_BRANCHES_NAMES.include?(branch.split(' ').last.split('/', 2).last))
+			(weeks > (options[:weeks] || DEFAULT_WEEKS)) && !(NOBLE_BRANCHES_NAMES.include?(branch.split(' ').last.split('/', 2).last))
 		end
 		
 		puts  <<-FOO
